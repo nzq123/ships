@@ -1,17 +1,16 @@
-# statki: 2,3,4 polowe. dodanie wielkosci i kierunku gdzie go postawic. sprawdzenie czy da sie go postawic
-# strzały: wybranie pola podanego przez gracza i sprawdzenie czy jest tam statek
-# zasady gry: gracz ma 10 strzałow, jesli trafi w statek ma kolejny strzal, jesli nie trafi traci 1 zycie
-# jesli bezdie to statek 1 polowy, przy pierwszym strzale jest zatopiony
-# reszta musi dac jakis znak ze nie jest zatopiona i dalej zyje a jak sie zatopi to tez jakis znak
-# plansza wyswietlenie: musi byc cala druga plansza pusta i gracz ma strzelac w nia, po strzale wyswietla pole czy jest
-# trafione czy nie + wyswietla ilosc pozostalychstrzalow
-
-
 import random
 
 tab = []
 
+game_tab = []
+
+ship_tab = []
+
 LETTERS = 'ABCDEFGHIJ'
+
+SHIP_SYMBOL = '🔥 '
+
+SHIP_MISS = 'X '
 
 
 def board():
@@ -30,9 +29,20 @@ def get_board():
     print()
 
 
-def shots():
-    if 'A0' in tab:
-        print('AO')
+def game_board():
+    for i in range(10):
+        tab2 = []
+        for j in range(10):
+            tab2.append(LETTERS[i] + str(j))
+        game_tab.append(tab2)
+
+
+def get_game_board():
+    for i in game_tab:
+        for j in i:
+            print(j, end=' ')
+        print()
+    print()
 
 
 def is_cord_valid(cord):
@@ -40,7 +50,7 @@ def is_cord_valid(cord):
 
 
 def is_pos_taken(x, y):
-    return tab[x][y] == '# '
+    return tab[x][y] == SHIP_SYMBOL
 
 
 def is_pos_valid(x, y):
@@ -75,6 +85,18 @@ def is_pos_valid(x, y):
     return True
 
 
+def shots(x, y):
+    if is_pos_taken(x, y):
+        if tab[x][y] == SHIP_SYMBOL:
+            return True
+    elif game_tab[x][y] == SHIP_SYMBOL or game_tab[x][y] == SHIP_MISS:
+        print("Już strzelałeś w te pole")
+        return True
+    else:
+        print('Pudło')
+        return False
+
+
 def free_place():
     for i in range(len(tab)):
         for j in range(len(tab[0])):
@@ -104,12 +126,77 @@ def ship_direction(x, y):
 
 def get_ships():
 
-    for i in range(4):
-        if free_place():
-            x, y = choose_random()
-            while not is_pos_valid(x, y):
+    for i in range(1):
+        x, y = choose_random()
+        random_cord = ship_direction(x, y)
+        if random_cord == 'Down':
+            while not is_pos_valid(x, y) or not is_pos_valid(x - 1, y) or not is_pos_valid(x - 2, y) \
+                    or not is_pos_valid(x - 3, y):
                 x, y = choose_random()
-            tab[x][y] = '# '
+            tab[x][y] = SHIP_SYMBOL
+            tab[x - 1][y] = SHIP_SYMBOL
+            tab[x - 2][y] = SHIP_SYMBOL
+            tab[x - 3][y] = SHIP_SYMBOL
+            ship_tab.append([(x, y), (x - 1, y), (x - 2, y), (x - 3, y)])
+        if random_cord == "Up":
+            while not is_pos_valid(x, y) or not is_pos_valid(x + 1, y) or not is_pos_valid(x + 2, y) \
+                    or not is_pos_valid(x + 3, y):
+                x, y = choose_random()
+            tab[x][y] = SHIP_SYMBOL
+            tab[x + 1][y] = SHIP_SYMBOL
+            tab[x + 2][y] = SHIP_SYMBOL
+            tab[x + 3][y] = SHIP_SYMBOL
+            ship_tab.append([(x, y), (x + 1, y), (x + 2, y), (x + 3, y)])
+        if random_cord == "Left":
+            while not is_pos_valid(x, y) or not is_pos_valid(x, y - 1) or not is_pos_valid(x, y - 2) \
+                    or not is_pos_valid(x, y - 3):
+                x, y = choose_random()
+            tab[x][y] = SHIP_SYMBOL
+            tab[x][y - 1] = SHIP_SYMBOL
+            tab[x][y - 2] = SHIP_SYMBOL
+            tab[x][y - 3] = SHIP_SYMBOL
+            ship_tab.append([(x, y), (x, y - 1), (x, y - 2), (x, y - 3)])
+        if random_cord == "Right":
+            while not is_pos_valid(x, y) or not is_pos_valid(x, y + 1) or not is_pos_valid(x, y + 2) \
+                    or not is_pos_valid(x, y + 3):
+                x, y = choose_random()
+            tab[x][y] = SHIP_SYMBOL
+            tab[x][y + 1] = SHIP_SYMBOL
+            tab[x][y + 2] = SHIP_SYMBOL
+            tab[x][y + 3] = SHIP_SYMBOL
+            ship_tab.append([(x, y), (x, y + 1), (x, y + 2), (x, y + 3)])
+
+    for i in range(2):
+        x, y = choose_random()
+        random_cord = ship_direction(x, y)
+        if random_cord == 'Down':
+            while not is_pos_valid(x, y) or not is_pos_valid(x - 1, y) or not is_pos_valid(x - 2, y):
+                x, y = choose_random()
+            tab[x][y] = SHIP_SYMBOL
+            tab[x - 1][y] = SHIP_SYMBOL
+            tab[x - 2][y] = SHIP_SYMBOL
+            ship_tab.append([(x, y), (x - 1, y), (x - 2, y)])
+        if random_cord == "Up":
+            while not is_pos_valid(x, y) or not is_pos_valid(x + 1, y) or not is_pos_valid(x + 2, y):
+                x, y = choose_random()
+            tab[x][y] = SHIP_SYMBOL
+            tab[x + 1][y] = SHIP_SYMBOL
+            tab[x + 2][y] = SHIP_SYMBOL
+            ship_tab.append([(x, y), (x + 1, y), (x + 2, y)])
+        if random_cord == "Left":
+            while not is_pos_valid(x, y) or not is_pos_valid(x, y - 1) or not is_pos_valid(x, y - 2):
+                x, y = choose_random()
+            tab[x][y] = SHIP_SYMBOL
+            tab[x][y - 1] = SHIP_SYMBOL
+            tab[x][y - 2] = SHIP_SYMBOL
+            ship_tab.append([(x, y), (x, y - 1), (x, y - 2)])
+        if random_cord == "Right":
+            while not is_pos_valid(x, y) or not is_pos_valid(x, y + 1) or not is_pos_valid(x, y + 2):
+                x, y = choose_random()
+            tab[x][y] = SHIP_SYMBOL
+            tab[x][y + 1] = SHIP_SYMBOL
+            tab[x][y + 2] = SHIP_SYMBOL
+            ship_tab.append([(x, y), (x, y + 1), (x, y + 2)])
 
     for i in range(3):
         x, y = choose_random()
@@ -118,98 +205,76 @@ def get_ships():
             while not is_pos_valid(x, y) or not is_pos_valid(x - 1, y):
                 x, y = choose_random()
 
-            tab[x][y] = '# '
-            tab[x - 1][y] = '# '
+            tab[x][y] = SHIP_SYMBOL
+            tab[x - 1][y] = SHIP_SYMBOL
+            ship_tab.append([(x, y), (x, y - 1)])
         if random_cord == "Up":
             while not is_pos_valid(x, y) or not is_pos_valid(x + 1, y):
                 x, y = choose_random()
-
-            tab[x][y] = '# '
-            tab[x + 1][y] = '# '
+            tab[x][y] = SHIP_SYMBOL
+            tab[x + 1][y] = SHIP_SYMBOL
+            ship_tab.append([(x, y), (x, y + 1)])
         if random_cord == "Left":
             while not is_pos_valid(x, y) or not is_pos_valid(x, y - 1):
                 x, y = choose_random()
-
-            tab[x][y] = '# '
-            tab[x][y - 1] = '# '
+            tab[x][y] = SHIP_SYMBOL
+            tab[x][y - 1] = SHIP_SYMBOL
+            ship_tab.append([(x, y), (x, y - 1)])
         if random_cord == "Right":
             while not is_pos_valid(x, y) or not is_pos_valid(x, y + 1):
                 x, y = choose_random()
+            tab[x][y] = SHIP_SYMBOL
+            tab[x][y + 1] = SHIP_SYMBOL
+            ship_tab.append([(x, y), (x, y + 1)])
 
-            tab[x][y] = '# '
-            tab[x][y + 1] = '# '
-
-    for i in range(2):
-        x, y = choose_random()
-        random_cord = ship_direction(x, y)
-        if random_cord == 'Down':
-            while not is_pos_valid(x, y) or not is_pos_valid(x - 1, y) or not is_pos_valid(x - 2, y):
+    for i in range(4):
+        if free_place():
+            x, y = choose_random()
+            while not is_pos_valid(x, y):
                 x, y = choose_random()
+            tab[x][y] = SHIP_SYMBOL
+            ship_tab.append([(x, y)])
 
-            tab[x][y] = '# '
-            tab[x - 1][y] = '# '
-            tab[x - 2][y] = '# '
-        if random_cord == "Up":
-            while not is_pos_valid(x, y) or not is_pos_valid(x + 1, y) or not is_pos_valid(x + 2, y):
-                x, y = choose_random()
+    get_board()
+    print()
 
-            tab[x][y] = '# '
-            tab[x + 1][y] = '# '
-            tab[x + 2][y] = '# '
-        if random_cord == "Left":
-            while not is_pos_valid(x, y) or not is_pos_valid(x, y - 1) or not is_pos_valid(x, y - 2):
-                x, y = choose_random()
-
-            tab[x][y] = '# '
-            tab[x][y - 1] = '# '
-            tab[x][y - 2] = '# '
-        if random_cord == "Right":
-            while not is_pos_valid(x, y) or not is_pos_valid(x, y + 1) or not is_pos_valid(x, y + 2):
-                x, y = choose_random()
-
-            tab[x][y] = '# '
-            tab[x][y + 1] = '# '
-            tab[x][y + 2] = '# '
-
-    # up = x - 1, y
-    # down= x + 1, y
-    # right = x, y + 1
-    # left = x, y - 1
-    #
-    # up = x - 1, y, x - 2, y
-    # down = x + 1, y, x + 2, y,
-    # right = x, y + 1, right = x, y + 2
-    # left = x, y - 1, x, y - 2,
-    #
-    # up = x - 1, y up = x - 2, y up = x - 3, y
-    # down = x + 1, y  down = x + 2, y  down = x + 3, y
-    # right = x, y + 1 right = x, y + 2 right = x, y + 3
-    # left = x, y - 1 left = x, y - 2 left = x, y - 3
-
-
-
-    # while i < 2:
-    #     x = LETTERS[random.randint(0, 9)]
-    #     y = random.randint(0, 9)
-    #     result = ships(x, y, 3, 'up')
-    #     if result:
-    #         i += 1
-    #
-    # i = 0
-    # while i < 1:
-    #     x = LETTERS[random.randint(0, 9)]
-    #     y = random.randint(0, 9)
-    #     result = ships(x, y, 4, 'up')
-    #     if result:
-    #         i += 1
 
 board()
+game_board()
 get_ships()
-get_board()
 free_place()
-#shots()
 
-#ships('j', 5, 1, 'up')
-#ships('a', 7, 1, 'up')
-#ships('b', 3, 1, 'up')
-#get_board()
+for i in ship_tab:
+    print(i)
+
+num_shots = 10
+while num_shots > 0:
+    get_game_board()
+    x = int(input("Podaj pierwsze współrzędne: "))
+    y = int(input("Podaj drugie współrzędne: "))
+    if shots(x, y) is True:
+        for i in ship_tab:
+            for j in i:
+                if j[0] == x and j[1] == y:
+                    game_tab[x][y] = SHIP_SYMBOL
+                    ship_tab[ship_tab.index(i)].remove((x, y))
+                    if len(i) != 0:
+                        print('Trafiony')
+                    else:
+                        print('Zatopiony')
+    else:
+        game_tab[x][y] = SHIP_MISS
+        num_shots -= 1
+        print(f"Zostało Ci {num_shots} strzałów")
+
+
+
+# uzytkownik podaje pole, musimy sprawdzic czy te pole jest w tablicy.
+# jesli jest, wybrac ta tablice i usunac te pole -> sprawdzac dlugosc
+# jesli dlugosc jest wieksza niz 0 -> trafiony, 0 == zatopiony
+
+board()
+game_board()
+get_ships()
+free_place()
+print(ship_tab)
