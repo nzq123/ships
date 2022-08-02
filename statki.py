@@ -242,9 +242,6 @@ def get_ships():
             tab[x][y] = SHIP_SYMBOL
             ship_tab.append([(x, y)])
 
-    get_board()
-    print()
-
 
 board()
 game_board()
@@ -255,8 +252,11 @@ free_place()
 num_shots = 10
 while num_shots > 0 and ships_left() is True:
     get_game_board()
-    x = int(input("Podaj pierwsze współrzędne: "))
-    y = int(input("Podaj drugie współrzędne: "))
+
+    a, b = input(f"Podaj współrzędne: ")
+    x = LETTERS.index(a.upper())
+    y = int(b)
+
     if shots(x, y) is True:
         for i in ship_tab:
             for j in i:
