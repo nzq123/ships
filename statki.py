@@ -45,6 +45,15 @@ def get_game_board():
     print()
 
 
+def ships_left():
+    res = 0
+    for i in ship_tab:
+        for j in i:
+            if len(j) != 0:
+                res += 1
+    return res != 0
+
+
 def is_cord_valid(cord):
     return 0 <= cord <= 9
 
@@ -86,11 +95,10 @@ def is_pos_valid(x, y):
 
 
 def shots(x, y):
-    if is_pos_taken(x, y):
-        if tab[x][y] == SHIP_SYMBOL:
-            return True
-    elif game_tab[x][y] == SHIP_SYMBOL or game_tab[x][y] == SHIP_MISS:
+    if game_tab[x][y] == SHIP_MISS or game_tab[x][y] == SHIP_SYMBOL:
         print("Już strzelałeś w te pole")
+        return True
+    elif is_pos_taken(x, y):
         return True
     else:
         print('Pudło')
@@ -204,16 +212,15 @@ def get_ships():
         if random_cord == 'Down':
             while not is_pos_valid(x, y) or not is_pos_valid(x - 1, y):
                 x, y = choose_random()
-
             tab[x][y] = SHIP_SYMBOL
             tab[x - 1][y] = SHIP_SYMBOL
-            ship_tab.append([(x, y), (x, y - 1)])
+            ship_tab.append([(x, y), (x - 1, y)])
         if random_cord == "Up":
             while not is_pos_valid(x, y) or not is_pos_valid(x + 1, y):
                 x, y = choose_random()
             tab[x][y] = SHIP_SYMBOL
             tab[x + 1][y] = SHIP_SYMBOL
-            ship_tab.append([(x, y), (x, y + 1)])
+            ship_tab.append([(x, y), (x + 1, y)])
         if random_cord == "Left":
             while not is_pos_valid(x, y) or not is_pos_valid(x, y - 1):
                 x, y = choose_random()
@@ -244,11 +251,9 @@ game_board()
 get_ships()
 free_place()
 
-for i in ship_tab:
-    print(i)
 
 num_shots = 10
-while num_shots > 0:
+while num_shots > 0 and ships_left() is True:
     get_game_board()
     x = int(input("Podaj pierwsze współrzędne: "))
     y = int(input("Podaj drugie współrzędne: "))
@@ -267,14 +272,8 @@ while num_shots > 0:
         num_shots -= 1
         print(f"Zostało Ci {num_shots} strzałów")
 
+if ships_left() is False:
+    print("Wygrałeś")
+else:
+    print("Przegrałeś")
 
-
-# uzytkownik podaje pole, musimy sprawdzic czy te pole jest w tablicy.
-# jesli jest, wybrac ta tablice i usunac te pole -> sprawdzac dlugosc
-# jesli dlugosc jest wieksza niz 0 -> trafiony, 0 == zatopiony
-
-board()
-game_board()
-get_ships()
-free_place()
-print(ship_tab)
